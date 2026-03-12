@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adam Nieckarz — Games Programmer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #080c10;
+        --bg2: #0d1318;
+        --bg3: #121920;
+        --line: #1e2d38;
+        --accent: #00e5ff;
+        --accent2: #ff4d6d;
+        --text: #c8d8e0;
+        --text-dim: #748da7;
+        --mono: "Share Tech Mono", monospace;
+        --sans: "Barlow", sans-serif;
+        --cond: "Barlow Condensed", sans-serif;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-weight: 300;
+        line-height: 1.7;
+        overflow-x: hidden;
+      }
+
+      /* ── Scanline overlay ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.07) 2px,
+          rgba(0, 0, 0, 0.07) 4px
+        );
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      /* ── Nav ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2rem 3rem;
+        background: rgba(8, 12, 16, 0.85);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav-logo {
+        font-family: var(--mono);
+        color: var(--accent);
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      /* ── Hero ── */
+      #hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 8rem 3rem 4rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 60px 60px;
+        opacity: 0.35;
+        mask-image: radial-gradient(
+          ellipse 80% 80% at 50% 50%,
+          black 30%,
+          transparent 100%
+        );
+      }
+
+      .hero-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 229, 255, 0.06) 0%,
+          transparent 70%
+        );
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .hero-tag {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.2em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 1.2rem;
+        opacity: 0;
+        animation: fadeUp 0.6s 0.2s forwards;
+      }
+
+      h1 {
+        font-family: var(--cond);
+        font-weight: 900;
+        font-size: clamp(3.5rem, 10vw, 8rem);
+        line-height: 0.95;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
+        color: #fff;
+        opacity: 0;
+        animation: fadeUp 0.6s 0.35s forwards;
+      }
+
+      h1 span {
+        color: var(--accent);
+      }
+
+      .hero-sub {
+        margin-top: 1.8rem;
+        font-size: 1.05rem;
+        color: var(--text-dim);
+        max-width: 480px;
+        opacity: 0;
+        animation: fadeUp 0.6s 0.5s forwards;
+      }
+
+      .hero-links {
+        margin-top: 2.5rem;
+        display: flex;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        animation: fadeUp 0.6s 0.65s forwards;
+      }
+
+      .btn {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.75rem 1.8rem;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        text-decoration: none;
+        background: transparent;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          color 0.2s;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      .btn.filled {
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      .btn.filled:hover {
+        background: transparent;
+        color: var(--accent);
+      }
+
+      /* ── Section base ── */
+      section {
+        padding: 6rem 3rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .section-label {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.6rem;
+      }
+
+      h2 {
+        font-family: var(--cond);
+        font-weight: 900;
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        text-transform: uppercase;
+        color: #fff;
+        line-height: 1;
+        margin-bottom: 3rem;
+      }
+
+      /* ── Divider ── */
+      .divider {
+        border: none;
+        border-top: 1px solid var(--line);
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      /* ── Projects ── */
+      .project {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: start;
+        margin-bottom: 5rem;
+        padding-bottom: 5rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .project:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .project.reverse {
+        direction: rtl;
+      }
+      .project.reverse > * {
+        direction: ltr;
+      }
+
+      .project-media {
+        position: relative;
+        z-index: 1000;
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        aspect-ratio: 16/9;
+      }
+
+      .project-media iframe,
+      .project-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border: none;
+      }
+
+      .project-media .media-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        color: var(--text-dim);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+      }
+
+      .project-media .media-placeholder svg {
+        opacity: 0.3;
+      }
+
+      .project-index {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--accent2);
+        letter-spacing: 0.15em;
+        margin-bottom: 0.5rem;
+      }
+
+      h3 {
+        font-family: var(--cond);
+        font-weight: 900;
+        font-size: 1.9rem;
+        text-transform: uppercase;
+        color: #fff;
+        line-height: 1.05;
+        margin-bottom: 0.8rem;
+      }
+
+      .project-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .tag {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        padding: 0.2rem 0.7rem;
+        border: 1px solid var(--line);
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+
+      .tag.highlight {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .project-desc {
+        font-size: 0.95rem;
+        color: var(--text);
+        margin-bottom: 1.5rem;
+      }
+
+      .tech-callout {
+        background: var(--bg3);
+        border-left: 3px solid var(--accent);
+        padding: 0.8rem 1.2rem;
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        margin-bottom: 1.5rem;
+        font-family: var(--mono);
+        line-height: 1.6;
+      }
+
+      .tech-callout strong {
+        color: var(--accent);
+        font-family: var(--mono);
+      }
+
+      .project-links {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+
+      /* ── Skills ── */
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+      }
+
+      .skill-cell {
+        background: var(--bg2);
+        padding: 1.5rem;
+        transition: background 0.2s;
+      }
+
+      .skill-cell:hover {
+        background: var(--bg3);
+      }
+
+      .skill-cell-label {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+
+      .skill-cell-name {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .skill-cell-note {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        margin-top: 0.2rem;
+      }
+
+      /* ── About ── */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 4rem;
+        align-items: start;
+      }
+
+      .about-card {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        padding: 2rem;
+      }
+
+      .about-card-title {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      .about-card p {
+        font-size: 0.92rem;
+        color: var(--text-dim);
+        line-height: 1.75;
+      }
+
+      .about-card p + p {
+        margin-top: 0.8rem;
+      }
+
+      /* ── Contact ── */
+      #contact {
+        text-align: center;
+        padding: 6rem 3rem;
+        position: relative;
+      }
+
+      #contact::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 60% 60% at 50% 0%,
+          rgba(0, 229, 255, 0.04) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .contact-email {
+        font-family: var(--cond);
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: var(--accent);
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin: 1.5rem 0 2.5rem;
+        transition: opacity 0.2s;
+      }
+
+      .contact-email:hover {
+        opacity: 0.7;
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .social-links a {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+
+      .social-links a:hover {
+        color: var(--accent);
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 1.5rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 100%;
+      }
+
+      footer span {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+      }
+
+      /* ── Animations ── */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 768px) {
+        nav {
+          padding: 1rem 1.5rem;
+        }
+        .nav-links {
+          gap: 1.2rem;
+        }
+        #hero,
+        section {
+          padding-left: 1.5rem;
+          padding-right: 1.5rem;
+        }
+        .project,
+        .project.reverse {
+          grid-template-columns: 1fr;
+          direction: ltr;
+        }
+        .about-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+        footer {
+          flex-direction: column;
+          gap: 0.5rem;
+          text-align: center;
+        }
+      }
+
+      .exp-entry {
+        display: grid;
+        grid-template-columns: 120px 32px 1fr;
+        gap: 0 1.5rem;
+        align-items: start;
+      }
+
+      .exp-left {
+        text-align: right;
+        padding-top: 0.25rem;
+      }
+
+      .exp-date {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        letter-spacing: 0.08em;
+      }
+
+      .exp-duration {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        margin-top: 0.2rem;
+      }
+
+      .exp-line {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 0.3rem;
+      }
+
+      .exp-dot {
+        width: 10px;
+        height: 10px;
+        border: 2px solid var(--accent);
+        background: var(--bg);
+        flex-shrink: 0;
+      }
+
+      .exp-line::after {
+        content: "";
+        width: 1px;
+        flex: 1;
+        min-height: 60px;
+        background: var(--line);
+        margin-top: 0.4rem;
+      }
+
+      .exp-right {
+        padding-bottom: 2.5rem;
+      }
+
+      .exp-role {
+        font-family: var(--cond);
+        font-weight: 700;
+        font-size: 1.4rem;
+        text-transform: uppercase;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .exp-company {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        margin: 0.4rem 0 0.8rem;
+      }
+
+      .exp-location {
+        color: var(--text-dim);
+        opacity: 0.6;
+      }
+
+      .exp-detail {
+        font-size: 0.92rem;
+        color: var(--text);
+        line-height: 1.75;
+        max-width: 560px;
+      }
+
+      @media (max-width: 768px) {
+        .exp-entry {
+          grid-template-columns: 1fr;
+        }
+        .exp-left {
+          text-align: left;
+        }
+        .exp-line {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ── -->
+    <nav>
+      <div class="nav-logo">// ADAM_NIECKARZ.exe</div>
+      <ul class="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section id="hero">
+      <div class="hero-grid"></div>
+      <div class="hero-glow"></div>
+
+      <div class="hero-tag">
+        // Games Programmer &nbsp;·&nbsp; Silesia &nbsp;·&nbsp; Poland
+      </div>
+      <h1>Adam<br /><span>Nieckarz</span><br /></h1>
+      <p class="hero-sub">
+        I build the systems that make games feel alive. <br />
+        Currently seeking my first games industry role.
+      </p>
+      <div class="hero-links">
+        <a href="#projects" class="btn filled">View Projects</a>
+        <a href="#contact" class="btn">Get In Touch</a>
+        <a href="https://aallfik11.github.io/cv_polish.pdf" class="btn" target="_blank"
+          >Download CV - Polski</a
+        >
+        <a href="https://aallfik11.github.io/cv_english.pdf" class="btn" target="_blank"
+          >Download CV - English</a
+        >
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ── PROJECTS ── -->
+    <section id="projects">
+      <div class="section-label">// Selected work</div>
+      <h2>Projects</h2>
+
+      <!-- PROJECT 1: Cyberninja VR -->
+      <div class="project">
+        <div class="project-media">
+          <iframe
+            src="https://www.youtube.com/embed/b3ueRli3Uas?si=zC2R1AegovoNGtjT"
+            allowfullscreen
+          ></iframe>
+          <!-- <img src="cyberninja-screenshot.jpg" alt="Cyberninja VR gameplay" /> -->
+        </div>
+
+        <div class="project-info">
+          <div class="project-index">PROJECT_01</div>
+          <h3>Cyberninja VR</h3>
+          <div class="project-stack">
+            <span class="tag highlight">UE5</span>
+            <span class="tag highlight">VR</span>
+            <span class="tag highlight">C++</span>
+            <span class="tag">Multithreading</span>
+            <span class="tag">Skeletal Mesh</span>
+            <span class="tag">Engineer's Thesis</span>
+            <span class="tag">Blueprints</span>
+          </div>
+          <p class="project-desc">
+            A VR action game built in Unreal Engine 5 as my engineering thesis
+            project. The game serves as a technical showcase for a custom
+            real-time skeletal mesh slicing system, inspired by Metal Gear
+            Rising: Revengeance, that lets you cut enemies into pieces
+            mid-combat.
+          </p>
+          <div class="tech-callout">
+            <strong>Key system:</strong> Real-time skeletal mesh bisection with
+            multithreaded processing. Latency is hidden via async dispatch,
+            keeping the slice feeling instant on the player's end despite the
+            computation happening off the game thread.
+          </div>
+          <div class="project-links">
+            <a
+              href="https://drive.google.com/file/d/16_OIzUln_IG5ajRiuFVUBmXSt7peq9eb/view?usp=sharing"
+              class="btn"
+              target="_blank"
+              >Download Build</a
+            >
+            <a
+              href="https://github.com/aallfik11/CyberninjaVR"
+              class="btn"
+              target="_blank"
+              >GITHUB (C++ code)</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 2: Skeleton Slayer -->
+      <div class="project reverse">
+        <div class="project-media">
+          <iframe
+            src="https://www.youtube.com/embed/i5iTQugK3jc?si=Wn61kELBDJsjrNuQ"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="project-info">
+          <div class="project-index">PROJECT_02</div>
+          <h3>Skeleton Slayer</h3>
+          <div class="project-stack">
+            <span class="tag highlight">UE5</span>
+            <span class="tag highlight">C++</span>
+            <span class="tag">Combat Systems</span>
+            <span class="tag">Enemy AI</span>
+            <span class="tag">Animation</span>
+            <span class="tag">Team Project</span>
+            <span class="tag">Blueprints</span>
+          </div>
+          <p class="project-desc">
+            A melee combat game built in Unreal Engine 5 with a small team. I
+            led the engineering side of the project, implementing a directional
+            combat system inspired by games like Chivalry: Medieval Warfare,
+            with AI-controlled skeleton enemies.
+          </p>
+          <div class="tech-callout">
+            <strong>Key system:</strong> First person directional melee combat
+            with hit detection based on collision boxes. The system supports
+            different attack directions, combos, and integrates with the
+            animation system for smooth transitions.
+          </div>
+          <div class="project-links">
+            <a
+              href="https://github.com/aallfik11/Skeleton-Slayer"
+              class="btn"
+              target="_blank"
+              >GitHub (C++ Code)</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 3: DX11 Minecraft Clone -->
+      <div class="project">
+        <div class="project-media">
+          <iframe
+            src="https://www.youtube.com/embed/sTZkcg1XBM8?si=qiMlJ4lzXMFMUmch"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="project-info">
+          <div class="project-index">PROJECT_03</div>
+          <h3>Voxel Renderer</h3>
+          <div class="project-stack">
+            <span class="tag highlight">DirectX 11</span>
+            <span class="tag highlight">C++</span>
+            <span class="tag">WinAPI</span>
+            <span class="tag">PBR Rendering</span>
+            <span class="tag">Shadow mapping</span>
+            <span class="tag">Deferred Rendering</span>
+            <span class="tag">No Engine</span>
+          </div>
+          <p class="project-desc">
+            A Minecraft-style voxel renderer built entirely from scratch with my
+            friend. No engine, just DirectX 11, WinAPI, and C++. The focus of
+            the project was to deepen our understanding of various rendering
+            techniques: chunk management, meshing, shadow mapping, deferred
+            rendering, and a physically-based rendering pipeline with
+            hand-crafted textures.
+          </p>
+          <div class="tech-callout">
+            <strong>Key systems:</strong> Face culling for chunk geometry,
+            shadow mapping, custom PBR shader pipeline, deferred rendering,
+            hand-painted textures with all the necessary maps to make the PBR
+            magic happen.
+          </div>
+          <div class="project-links">
+            <a
+              href="https://github.com/zbysiukaczucha/Bloczki-Gra-PwAG"
+              class="btn"
+              target="_blank"
+              >GitHub</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ── EXPERIENCE ── -->
+
+    <section id="experience">
+      <div class="section-label">// Industry</div>
+      <h2>Experience</h2>
+
+      <div class="exp-entry">
+        <div class="exp-left">
+          <div class="exp-date">2023 / 2024</div>
+          <div class="exp-duration">3 months</div>
+        </div>
+        <div class="exp-line">
+          <div class="exp-dot"></div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-role">Software Engineer Intern</div>
+          <div class="exp-company">
+            Sperasoft <span class="exp-location">· Poland</span>
+          </div>
+          <div class="exp-detail">
+            Co-development work on an EA Sports title. First exposure to a
+            professional studio codebase and shipping-level development
+            standards.
+          </div>
+          <div class="project-stack" style="margin-top: 1rem">
+            <span class="tag highlight">C++</span>
+            <span class="tag highlight">Perforce</span>
+            <span class="tag">AAA Co-dev</span>
+            <span class="tag">EA Sports</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <hr class="divider" />
+
+    <!-- ── SKILLS ── -->
+    <section id="skills">
+      <div class="section-label">// Technical stack</div>
+      <h2>Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-cell">
+          <div class="skill-cell-label">Primary Engine</div>
+          <div class="skill-cell-name">Unreal Engine 5</div>
+          <div class="skill-cell-note">C++, Blueprints</div>
+        </div>
+        <div class="skill-cell">
+          <div class="skill-cell-label">Graphics API</div>
+          <div class="skill-cell-name">DirectX 11</div>
+          <div class="skill-cell-note">Custom renderers, shaders</div>
+        </div>
+        <div class="skill-cell">
+          <div class="skill-cell-label">Programming Language</div>
+          <div class="skill-cell-name">C++</div>
+          <div class="skill-cell-note">
+            Primary language, Multithreading, New C++ Standards
+          </div>
+        </div>
+        <div class="skill-cell">
+          <div class="skill-cell-label">Spoken Languages</div>
+          <div class="skill-cell-name">Polish, English</div>
+          <div class="skill-cell-note">Polish - native, English - fluent</div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ── ABOUT ── -->
+    <section id="about">
+      <div class="section-label">// Background</div>
+      <h2>About</h2>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-card-title">// Status</div>
+          <p>
+            Master's degree in Computer Science, Silesian University of
+            Technology, graduating 2026.
+          </p>
+          <p>
+            Based in Silesia, Poland. Open to opportunities in the games
+            industry.
+          </p>
+          <p>
+            Targeting: gameplay programmer, engine programmer, or junior
+            generalist roles.
+          </p>
+        </div>
+        <div>
+          <p style="font-size: 1rem; line-height: 1.85; color: var(--text)">
+            I've spent my university years building game-related projects
+            whenever I could — not because it was required, but because it's the
+            kind of problem-solving I actually enjoy. I'm drawn to the systems
+            side of game development: the code that makes the magic happen,
+            whether it's a custom renderer or a complex gameplay mechanic.
+          </p>
+          <p
+            style="
+              font-size: 1rem;
+              line-height: 1.85;
+              color: var(--text);
+              margin-top: 1rem;
+            "
+          >
+            My thesis project pushed me to solve a genuinely hard problem —
+            real-time mesh bisection in VR — and I came out of it with a deeper
+            understanding of Unreal Engine and graphics programming principles
+            responsible for displaying and animating skeletal meshes. The DX11
+            renderer taught me that understanding what an engine does for you
+            matters as much as knowing how to use one.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ── CONTACT ── -->
+    <section id="contact">
+      <div class="section-label">// Get in touch</div>
+      <h2>Let's Talk</h2>
+      <p
+        style="
+          color: var(--text-dim);
+          font-size: 0.95rem;
+          max-width: 420px;
+          margin: 0 auto;
+        "
+      >
+        I'm actively looking for junior programmer roles in the games industry.
+        If you have an opening or just want to talk shop, reach out.
+      </p>
+      <a href="mailto:adamnieckarz02@gmail.com" class="contact-email"
+        >adamnieckarz02@gmail.com</a
+      >
+
+      <div class="social-links">
+        <a href="https://github.com/aallfik11" target="_blank">GitHub</a>
+        <a
+          href="https://www.linkedin.com/in/adam-nieckarz-087027264"
+          target="_blank"
+          >LinkedIn</a
+        >
+        <!-- <a href="https://currentlyplaceholderjustincaseieverdecidetoposton.itch.io" target="_blank">Itch.io</a> -->
+      </div>
+    </section>
+
+    <footer>
+      <span>// Adam Nieckarz — Games Programmer</span>
+      <span>Built with HTML · Hosted on GitHub Pages</span>
+    </footer>
+  </body>
+</html>
