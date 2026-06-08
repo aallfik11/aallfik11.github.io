@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Yes, this website it AI-generated. I am not a web developer, nor am I aspiring to become one, so I used AI to simply get a website going. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -386,6 +387,123 @@
         flex-wrap: wrap;
       }
 
+      /* ── Carousel ── */
+      .carousel {
+        position: relative;
+        z-index: 1000;
+      }
+
+      .carousel-slides {
+        background: var(--bg2);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        position: relative;
+      }
+
+      .carousel-track {
+        display: flex;
+        height: 100%;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .carousel-slide {
+        min-width: 100%;
+        height: 100%;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .carousel-slide iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .carousel-slide .media-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        color: var(--text-dim);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+      }
+
+      .carousel-slide .media-placeholder svg {
+        opacity: 0.3;
+      }
+
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: rgba(8, 12, 16, 0.75);
+        border: 1px solid var(--line);
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .carousel-btn:hover {
+        background: rgba(0, 229, 255, 0.12);
+        border-color: var(--accent);
+      }
+
+      .carousel-btn.prev { left: 0.6rem; }
+      .carousel-btn.next { right: 0.6rem; }
+
+      .carousel-slide-label {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.6rem;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        background: rgba(8, 12, 16, 0.72);
+        padding: 0.15rem 0.5rem;
+        pointer-events: none;
+        opacity: 0.85;
+        z-index: 5;
+      }
+
+      .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding-top: 0.6rem;
+      }
+
+      .carousel-dot {
+        width: 6px;
+        height: 6px;
+        background: transparent;
+        border: 1px solid var(--text-dim);
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .carousel-dot.active {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
       /* ── Skills ── */
       .skills-grid {
         display: grid;
@@ -717,12 +835,34 @@
 
       <!-- PROJECT 1: Cyberninja VR -->
       <div class="project">
-        <div class="project-media">
-          <iframe
-            src="https://www.youtube.com/embed/b3ueRli3Uas?si=zC2R1AegovoNGtjT"
-            allowfullscreen
-          ></iframe>
-          <!-- <img src="cyberninja-screenshot.jpg" alt="Cyberninja VR gameplay" /> -->
+        <div class="carousel">
+          <div class="carousel-slides">
+            <div class="carousel-track" id="cyberninja-track">
+
+              <!-- Slide 1: Slicing showcase -->
+              <div class="carousel-slide">
+                   <iframe data-src="https://www.youtube.com/embed/xcGPGhlGWlI" allowfullscreen>
+                   </iframe>
+                <div class="carousel-slide-label">// slicing_showcase</div>
+              </div>
+
+              <!-- Slide 2: Gameplay -->
+              <div class="carousel-slide">
+                <iframe
+                  data-src="https://www.youtube.com/embed/b3ueRli3Uas"
+                  allowfullscreen
+                ></iframe>
+                <div class="carousel-slide-label">// gameplay</div>
+              </div>
+
+            </div>
+            <button type="button" class="carousel-btn prev" onclick="carouselNav('cyberninja', -1)">&#8592;</button>
+            <button type="button" class="carousel-btn next" onclick="carouselNav('cyberninja', 1)">&#8594;</button>
+          </div>
+          <div class="carousel-dots" id="cyberninja-dots">
+            <div class="carousel-dot active" onclick="carouselGoto('cyberninja', 0)"></div>
+            <div class="carousel-dot" onclick="carouselGoto('cyberninja', 1)"></div>
+          </div>
         </div>
 
         <div class="project-info">
@@ -830,19 +970,15 @@
             <span class="tag">PBR Rendering</span>
             <span class="tag">Shadow mapping</span>
             <span class="tag">Deferred Rendering</span>
-            <span class="tag">No Engine</span>
           </div>
           <p class="project-desc">
-            A Minecraft-style voxel renderer built entirely from scratch with my
-            friend. No engine, just DirectX 11, WinAPI, and C++. The focus of
-            the project was to deepen our understanding of various rendering
-            techniques: chunk management, meshing, shadow mapping, deferred
-            rendering, and a physically-based rendering pipeline with
-            hand-crafted textures.
+            A Minecraft-style voxel renderer built entirely from scratch using DirectX 11, WinAPI, and C++. 
+            The focus of the project was to deepen my understanding of various rendering
+            techniques. 
           </p>
           <div class="tech-callout">
             <strong>Key systems:</strong> Face culling for chunk geometry,
-            shadow mapping, custom PBR shader pipeline, deferred rendering,
+            shadow mapping, PBR shading, deferred rendering pipeline,
             hand-painted textures with all the necessary maps to make the PBR
             magic happen.
           </div>
@@ -888,7 +1024,6 @@
             <span class="tag highlight">C++</span>
             <span class="tag highlight">Perforce</span>
             <span class="tag">AAA Co-dev</span>
-            <span class="tag">EA Sports</span>
           </div>
         </div>
       </div>
@@ -1011,5 +1146,42 @@
       <span>// Adam Nieckarz — Games Programmer</span>
       <span>Built with HTML · Hosted on GitHub Pages</span>
     </footer>
+    <script>
+      const _carousels = {};
+
+      function carouselUpdate(id) {
+        const { index } = _carousels[id];
+        const track = document.getElementById(`${id}-track`);
+        const slides = [...track.querySelectorAll('.carousel-slide')];
+        const dots = [...document.querySelectorAll(`#${id}-dots .carousel-dot`)];
+
+        slides.forEach((slide, i) => {
+          const iframe = slide.querySelector('iframe[data-src]');
+          if (!iframe) return;
+          if (i === index) {
+            if (!iframe.src) iframe.src = iframe.dataset.src;
+          } else {
+            iframe.removeAttribute('src');
+          }
+        });
+
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+      }
+
+      function carouselNav(id, dir) {
+        const track = document.getElementById(`${id}-track`);
+        const n = track.querySelectorAll('.carousel-slide').length;
+        _carousels[id].index = (_carousels[id].index + dir + n) % n;
+        carouselUpdate(id);
+      }
+
+      function carouselGoto(id, idx) {
+        _carousels[id].index = idx;
+        carouselUpdate(id);
+      }
+
+      _carousels['cyberninja'] = { index: 0 };
+    </script>
   </body>
 </html>
